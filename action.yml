@@ -1,0 +1,29 @@
+# GitHub Actions to run the RML Mapper
+name: 'RML Mapper Java'
+description: 'Run the Java RML Mapper to convert structured data to RDF'
+inputs:
+  mapping:  # id of input
+    description: 'One or more mapping file paths and/or strings (multiple values are concatenated)'
+    required: true
+    default: 'input.csv'
+  output:  # id of input
+    description: 'Path to output file'
+    required: false
+    default: 'rdf_output.nq'
+  serialization:  # id of input
+    description: 'Serialization format (nquads (default), trig, trix, jsonld, hdt)'
+    required: false
+    default: 'nquads'
+outputs:
+  rdf_output: # id of output
+    description: 'RDF output from the RMLMapper'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - --mapping
+    - ${{ inputs.mapping }}
+    - --output
+    - ${{ inputs.output }}
+    - --serialization
+    - ${{ inputs.serialization }}
