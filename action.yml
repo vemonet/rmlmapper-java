@@ -1,6 +1,9 @@
 # GitHub Actions to run the RML Mapper
 name: 'RML Mapper Java'
 description: 'Run the Java RML Mapper to convert structured data to RDF'
+branding:
+  icon: 'cast' 
+  color: 'blue'
 inputs:
   mapping:  # id of input
     description: 'One or more mapping file paths and/or strings (multiple values are concatenated)'
