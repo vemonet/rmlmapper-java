@@ -4,6 +4,19 @@ The RMLMapper execute RML rules to generate Linked Data.
 It is a Java library, which is available via the command line ([API docs online](https://rmlio.github.io/rmlmapper-java/apidocs/)).
 The RMLMapper loads all data in memory, so be aware when working with big datasets.
 
+## GitHub Action usage
+
+```yaml
+steps:
+- uses: vemonet/rmlmapper-java@4.8
+  with:
+    mapping: mapping.rml.ttl
+    output: rdf_output.nq
+    serialization: nquads
+```
+
+> Serialization format can be `nquads` (default), `trig`, `trix`, `jsonld`, `hdt`.
+
 ## Table of contents
 
 - [Features](#features)
