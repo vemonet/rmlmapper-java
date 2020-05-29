@@ -21,9 +21,9 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - --mapping
+    - "--mapping"
     - ${{ inputs.mapping }}
-    - --output
+    - "--output"
     - ${{ inputs.output }}
-    - --serialization
+    - "--serialization"
     - ${{ inputs.serialization }}
