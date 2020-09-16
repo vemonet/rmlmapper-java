@@ -71,4 +71,38 @@ public class Custom_RML_FnO_Mapper_Test extends TestFunctionCore {
     public void evaluate_A006() {
         doMapping("./rml-fno-test-cases/RMLFNOTCA006/mapping.ttl", "./rml-fno-test-cases/RMLFNOTCA006/output.ttl");
     }
+
+    /**
+     * Tests whether the function millisecondsToInstant can be loaded and is supported correctly by the mapper
+     */
+    @Test
+    public void evaluate_AB0001() throws Exception {
+        // load the functions from a test resource jar & description file
+        QuadStore functionDescriptionTriples = new RDF4JStore();
+        functionDescriptionTriples.read(Utils.getInputStreamFromFile(new File("./src/test/resources/aaabimfunctions/aaabim_java_mapping.ttl")), null, RDFFormat.TURTLE);
+        FunctionLoader functionLoader = new FunctionLoader(functionDescriptionTriples);
+
+        // You first need to execute the mapping, bc the libraryMap of loaded Jars is dynamically built
+        Executor executor = this.createExecutor("rml-fno-test-cases/RMLFNOTCAB0001-JSON/mapping.ttl", functionLoader);
+
+        // execute mapping
+        doMapping(executor, "rml-fno-test-cases/RMLFNOTCAB0001-JSON/output.ttl");
+    }
+
+    /**
+     * Tests whether the function geoHashToLatitude can be loaded and is supported correctly by the mapper
+     */
+    @Test
+    public void evaluate_AB0002() throws Exception {
+        // load the functions from a test resource jar & description file
+        QuadStore functionDescriptionTriples = new RDF4JStore();
+        functionDescriptionTriples.read(Utils.getInputStreamFromFile(new File("./src/test/resources/aaabimfunctions/aaabim_java_mapping.ttl")), null, RDFFormat.TURTLE);
+        FunctionLoader functionLoader = new FunctionLoader(functionDescriptionTriples);
+
+        // You first need to execute the mapping, bc the libraryMap of loaded Jars is dynamically built
+        Executor executor = this.createExecutor("rml-fno-test-cases/RMLFNOTCAB0002-JSON/mapping.ttl", functionLoader);
+
+        // execute mapping
+        doMapping(executor, "rml-fno-test-cases/RMLFNOTCAB0002-JSON/output.ttl");
+    }
 }

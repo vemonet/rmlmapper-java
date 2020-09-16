@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,15 +62,26 @@ public class FunctionUtils {
         return args;
     }
 
+    /**
+     * Generates strings from a function object. Possible lists/sets/bags/... in the object are unrolled recursively
+     * and a string value is generated from each "simple" (i.e., not a list/set/bag/...) child object.
+     *
+     * @param o      Function object, can be iterable.
+     * @param result A string list to which string values of objects are added
+     */
     public static void functionObjectToList(Object o, List<String> result) {
         if (o != null) {
-            if (o instanceof String) {
-                result.add((String) o);
-            } else if (o instanceof List) {
-                ((List) o).forEach(item -> {
+            // if o has child objects, recursively call this function on each child
+            if (o instanceof Iterable<?>) {
+                ((Iterable<?>) o).forEach(item -> {
                     functionObjectToList(item, result);
                 });
-            } else if (o instanceof Boolean) {
+            }
+            // if o has no children, call toString() to serialize it into a string
+            else {
+                // numeric and boolean types are trivially serialized correctly
+                // times/dates objects in the java.time package use the relevant ISO-8601 standard,
+                // which is also used by xsd types and thus RDF types
                 result.add(o.toString());
             }
         }
@@ -82,20 +94,46 @@ public class FunctionUtils {
             // This is quite crude, based on https://www.w3.org/TR/xmlschema11-2/#built-in-datatypes
             case "http://www.w3.org/2001/XMLSchema#string":
                 return String.class;
-            case "http://www.w3.org/2001/XMLSchema#integer":
+            case "http://www.w3.org/2001/XMLSchema#unsignedLong":
             case "http://www.w3.org/2001/XMLSchema#long":
+                return Long.class;
+            case "http://www.w3.org/2001/XMLSchema#integer":
             case "http://www.w3.org/2001/XMLSchema#int":
             case "http://www.w3.org/2001/XMLSchema#short":
             case "http://www.w3.org/2001/XMLSchema#byte":
             case "http://www.w3.org/2001/XMLSchema#nonNegativeInteger":
             case "http://www.w3.org/2001/XMLSchema#positiveInteger":
-            case "http://www.w3.org/2001/XMLSchema#unsignedLong":
             case "http://www.w3.org/2001/XMLSchema#unsignedInt":
             case "http://www.w3.org/2001/XMLSchema#unsignedShort":
             case "http://www.w3.org/2001/XMLSchema#unsignedByte":
             case "http://www.w3.org/2001/XMLSchema#nonPositiveInteger":
             case "http://www.w3.org/2001/XMLSchema#negativeInteger":
                 return Integer.class;
+            case "http://www.w3.org/2001/XMLSchema#date":
+                // "Local" just means "without a time zone"
+                return LocalDate.class;
+            case "http://www.w3.org/2001/XMLSchema#dateTime":
+                // again "Local" means "without a time zone"
+                // (An xsd:dateTime actually has an OPTIONAL time zone, so there is a small semantic difference
+                // with java.time.LocalDateTime, this is a best effort.)
+                return LocalDateTime.class;
+            case "http://www.w3.org/2001/XMLSchema#dateTimeStamp":
+                return ZonedDateTime.class;
+            case "http://www.w3.org/2001/XMLSchema#dayTimeDuration":
+            case "http://www.w3.org/2001/XMLSchema#yearMonthDuration":
+                return Duration.class;
+            case "http://www.w3.org/2001/XMLSchema#gDay":
+                // TODO there is no java.time equivalent of xsd:day
+                // (There is java.time.DayOfWeek, but xsd:day would corresponds to java.time.DayOfMonth .)
+                throw new DateTimeException("There is no java.time equivalent of xsd:day. Crashing.");
+            case "http://www.w3.org/2001/XMLSchema#gMonth":
+                return Month.class;
+            case "http://www.w3.org/2001/XMLSchema#gMonthDay":
+                return MonthDay.class;
+            case "http://www.w3.org/2001/XMLSchema#gYear":
+                return Year.class;
+            case "http://www.w3.org/2001/XMLSchema#gYearMonth":
+                return YearMonth.class;
             case "http://www.w3.org/2001/XMLSchema#decimal":
             case "http://www.w3.org/2001/XMLSchema#double":
             case "http://www.w3.org/2001/XMLSchema#float":
